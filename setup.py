@@ -1,44 +1,30 @@
 #! /usr/bin/env python
-from __future__ import print_function
-
+import numpy
 from setuptools import setup, Extension
+from Cython.Build import cythonize
 
-USE_CYTHON = False
 
-DISTNAME = 'lsh'
-DESCRIPTION = 'A library for performing shingling and LSH for python.'
+extensions = [
+    Extension(
+        "lsh.cMinhash",
+        ["lsh/cMinhash.pyx", "lsh/MurmurHash3.cpp"],
+        include_dirs=[numpy.get_include()],
+    )
+]
 
-MAINTAINER = 'Matti Lyra'
-MAINTAINER_EMAIL = 'matti.lyra@gmail.com'
-URL = 'https://github.com/mattilyra/lsh'
-DOWNLOAD_URL = 'https://github.com/mattilyra/lsh'
 
-VERSION = '0.3.0'
-
-ext = '.pyx' if USE_CYTHON else '.cpp'
-try:
-    import numpy as np
-    includes = [np.get_include()]
-except ImportError:
-    includes = []
-
-extensions = [Extension("lsh.cMinhash",
-                        ["lsh/cMinhash{}".format(ext), 'lsh/MurmurHash3.cpp'],
-                        include_dirs=includes)]
-if USE_CYTHON:
-    from Cython.Build import cythonize
-
-    extensions = cythonize(extensions)
-
-install_deps = ['numpy', 'cython>=0.24.1']
-test_deps = ['coverage>=4.0.3', 'pytest>=3.0', ]
-setup(name=DISTNAME,
-      version=VERSION,
-      description=DESCRIPTION,
-      author=MAINTAINER,
-      author_email=MAINTAINER_EMAIL,
-      url=URL,
-      packages=['lsh'],
-      ext_modules=extensions,
-      install_requires=install_deps,
-      tests_require=test_deps)
+setup(
+    name="lsh",
+    version="0.3.0",
+    description="A library for performing shingling and LSH.",
+    author="Matti Lyra",
+    author_email="matti.lyra@gmail.com",
+    url="https://github.com/mattilyra/lsh",
+    packages=["lsh"],
+    ext_modules=cythonize(extensions),
+    install_requires=["numpy"],
+    tests_require=[
+        "coverage>=4.0.3",
+        "pytest>=3.0",
+    ],
+)
